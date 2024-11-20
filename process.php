@@ -1,23 +1,20 @@
 <?php
-include 'Exporter/Exporter.php';
-include 'Exporter/TextExporter.php';
+include "autoload.php";
 
-//if($_SERVER["REQUEST_METHOD"] == 'POST'){
-//    echo 'Submitted';
-//    return ;
-//}
-
-$params = $_POST;
-[$title, $content, $format] = [$_POST['title'], $_POST['content'], $_POST['format']];
-
-
-//echo "Not Submitted";
-
-if(isset($params) && !empty($params)){
-    if($params['format']=='Text'){
-        $text = new TextExporter(['title' =>$params['title'],'content'=>$params['content']]);
-        $text->export();
-    }
-
-
+if ($_SERVER['REQUEST_METHOD'] != "POST") {
+    // echo "Not Submitted";
+    return;
 }
+
+
+//$params = $_POST;
+[$title, $content, $format] = [$_POST['title'], $_POST['content'], $_POST['format']];
+$whitelist = ['Text', 'Pdf', 'Json', 'Csv'];
+if (!in_array($format, $whitelist)) {
+    echo "Invalid Format !!!";
+    return;
+}
+$className = "\Exporter\\{$format}Exporter";
+$exporter = new $className(['title' => $title, 'content' => $content]);
+$exporter->export();
+
